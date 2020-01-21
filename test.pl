@@ -10,3 +10,6 @@ parent(henry, bessy).
 
 		predecessor(X,Z) :-parent(X,Z).
 		predecessor(U,Z) :-parent(U,Y),predecessor(Y,Z).
+		
+		xcanbey(X) :- gimmi(Y), write(Y).
+		gimmi(5).

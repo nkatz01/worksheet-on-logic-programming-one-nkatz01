@@ -17,27 +17,28 @@ which is defined in Prolog by the following 3 sets of predicates:
 %   parent(Parent, Child).
 %   Parent is the parent of Child.
 
+parent(henry, bessy).
+parent(clive, dave).
+parent(gene,betty).
+parent(alan, clive).
+parent(jake,alan).
+parent(freda, greta).
+parent(clarissa, dave).
+parent(andrea, clive).
+parent(clive, doris).
+parent(greg, henry).
+parent(clarissa, doris).
+parent(betty, clarissa).
+parent(eddie, greg).
+parent(greta, henry).
+parent(elsie, greg).
 parent(bruce, clarissa).
 parent(fred, greta).
 parent(doris,bobby).
 parent(richard,bobby).
 parent(chirs,richard).
-parent(greg, henry).
-parent(henry, bessy).
-parent(clive, dave).
-parent(clarissa, dave).
-parent(betty, clarissa).
-parent(eddie, greg).
-parent(gene,betty).
-parent(alan, clive).
-parent(jake,alan).
-parent(greta, henry).
-parent(elsie, greg).
 parent(roger,richard).
-parent(andrea, clive).
-parent(clive, doris).
-parent(freda, greta).
-parent(clarissa, doris).
+
 
 
 ancestor(A, B):-	% A is B's ancestor if
@@ -45,29 +46,10 @@ ancestor(A, B):-	% A is B's ancestor if
 
 ancestor(A, B):-
 	 
-	%write(' in second ancestor'),nl,
+	write(' in second ancestor'),nl,
     parent(P, B),	 
     ancestor(A, P).
-	
-ancestor1(A, B):-
-    parent(P, B),
-    ancestor1(A, P).
-	
-ancestor1(A, B):-
-    parent(A, B).
 
-ancestor2(A, B):-
-    parent(A, B).
-ancestor2(A, B):-
-    ancestor2(A, P),
-    parent(P, B).
-
-ancestor3(A, B):-
-    ancestor3(A, P),
-    parent(P, B).
-ancestor3(A, B):-
-    parent(A, B).
-	
 %   male(Person).
 %   This Person is male.
 
@@ -106,8 +88,7 @@ married(greg, greta).
 %   PROBLEM 1
 %   How do you find out if someone is the ancestor of someone else ?
 
-is_integer(0).
-is_integer(X) :- is_integer(Y), X is Y + 1.
+
 
 %   PROBLEM 2
 %   How do you find out if someone is the descendant of someone else ?
