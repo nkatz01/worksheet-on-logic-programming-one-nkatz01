@@ -35,7 +35,7 @@ descendent(X,Y) :- father(Y,Z), descendent(X,Z).
 commonAncestor(X,Y) :- descendent(X,Z), descendent(Y,Z).
 
 %5 Answer (of which explanation is in attached prologTracing.xlsx diagram) follows the naively implemented versions of above clauses.
-?- brother(X,Y).:
+/* ?- brother(X,Y).:
 	X = b
 	Y = c
 
@@ -96,6 +96,38 @@ commonAncestor(X,Y) :- descendent(X,Z), descendent(Y,Z).
 	X = f
 	Y = a
 
+*/
 
- 
- 
+%6
+myreverse(L,K) :- reverse(L,Lrev), K = Lrev.
+
+%7,8 & 9
+ffollows(anne,fred).
+follows(fred,julie).
+follows(fred,susan).
+follows(john,fred).
+follows(julie,fred).
+follows(susan,john).
+follows(susan,julie).
+
+
+tweeted(anne,[tweet1,tweet5]).
+tweeted(fred,[tweet2, tweet7,tweet8]).
+tweeted(john,[tweet3,tweet4]).
+tweeted(julie,[tweet6]).
+tweeted(susan,[tweet9,tweet10]).
+
+tweetsOf(X,Y):- tweeted(X,Y).
+
+canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
+
+mutual(X,Y) :- follows(X,Y), follows(Y,X).
+
+%only partial solution
+allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
+
+retweets(X,M) :- allTheyCanSee(X,Res), member(M,Res).
+
+%8
+
+   
