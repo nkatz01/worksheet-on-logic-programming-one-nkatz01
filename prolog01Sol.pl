@@ -120,6 +120,14 @@ tweeted(susan,[tweet9,tweet10]).
 tweetsOf(X,Y):- tweeted(X,Y).
 
 canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
+myList(I, L) :-
+    myList(I, [], L).
+	
+myList(I, Accum, L) :-
+    canReadMsg(I, Value),
+    \+ member(Value, Accum), !,
+    myList(I, [Value|Accum], L). 
+myList(I, L, [I,'->'|S]) :- flatten(L,S).
 
 mutual(X,Y) :- follows(X,Y), follows(Y,X).
 
