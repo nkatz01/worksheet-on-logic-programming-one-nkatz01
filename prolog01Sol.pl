@@ -119,32 +119,29 @@ tweeted(susan,[tweet9,tweet10]).
 
 tweetsOf(X,Y):- tweeted(X,Y).
 
-canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
 
-%accumulates all tweets that can be seen but for one person only
-myList(I, L) :-
-    myList(I, [], L).
-	
-myList(I, Accum, L) :-
-    canReadMsg(I, Value),
-    \+ member(Value, Accum), !,
-    myList(I, [Value|Accum], L). 
-myList(I, L, [I,'->'|S]) :- flatten(L,S).
+%a) Which messages can Fred see (assuming that only direct followers will see a message)?
 
-%improvement on canReadMsg but need to be implemented recursively (also still only one person)
-listAll(X,AllMsgs):- 
-	canReadMsg(X,Msg), listAll(X,Msg,AllMsg),flatten(AllMsg,AllMsgs).
+	%includes cut and base is after recurseive call  
+	canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
 
-	
-listAll(X,Acc,[Acc|Res]) :- 
-	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res.
+	listAllMsgForPerson(X,[X|[AllMsgs]]):- 
+	  listAll(X,[],AllMsg),flatten(AllMsg,AllMsgs).
+	listAll(X,Acc,Result) :- 
+	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res, listAll(X,[Res|Acc],Result),!.
+	listAll(X,Acc,Acc).
 	
 mutual(X,Y) :- follows(X,Y), follows(Y,X).
 
 %only partial solution
-allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
+%allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
 
-retweets(X,M) :- allTheyCanSee(X,Res), member(M,Res).
+%d) If everyone resends every message they receive, which messages can Fred see?
+
+
+retweets(X,T) :- listAllMsgForPerson(X,[_,T]).
+
+canAlsoSee(X,M) :- follows(X,Y),   retweets(Y,M); listAllMsgForPerson(X,[_,M]).
 
 %8
 
