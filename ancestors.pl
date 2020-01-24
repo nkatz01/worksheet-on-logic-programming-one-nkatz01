@@ -1,21 +1,4 @@
-/*   File:    ancestors.pl
-     Author:  Dave Robertson
-     Purpose: Relationships in a family tree
-Suppose we have a family tree like this :
-alan andrea   bruce betty      eddie elsie   fred  freda
- |     |        |     |          |     |       |     |
- |_____|        |_____|          |_____|       |_____|
-    |              |                |             |
-  clive        clarissa            greg         greta
-   |  |__________|___|              |             |
-   |__________|__|                  |_____________|
-          |   |                            |
-        dave doris                        henry
-which is defined in Prolog by the following 3 sets of predicates:
-*/
 
-%   parent(Parent, Child).
-%   Parent is the parent of Child.
 
 parent(bruce, clarissa).
 parent(fred, greta).
@@ -68,50 +51,7 @@ ancestor3(A, B):-
 ancestor3(A, B):-
     parent(A, B).
 	
-%   male(Person).
-%   This Person is male.
-
-male(alan).
-male(bruce).
-male(clive).
-male(dave).
-male(eddie).
-male(fred).
-male(greg).
-male(henry).
-
-
-%   female(Person).
-%   This Person is female.
-
-female(andrea).
-female(betty).
-female(clarissa).
-female(doris).
-female(elsie).
-female(freda).
-female(greta).
-
-
-%   married(Person1, Person2).
-%   Person1 is married to Person2.
-
-married(alan, andrea).
-married(bruce, betty).
-married(clive, clarissa).
-married(eddie, elsie).
-married(fred, freda).
-married(greg, greta).
-
-%   PROBLEM 1
-%   How do you find out if someone is the ancestor of someone else ?
-
-is_integer(0).
-is_integer(X) :- is_integer(Y), X is Y + 1.
-
-%   PROBLEM 2
-%   How do you find out if someone is the descendant of someone else ?
-
+ 
 descendant(A, B):-	% A is B's descendant if
     parent(B, A).	% B is A's parent.
 
@@ -134,44 +74,33 @@ related(A, B):-		% A is related to B if
     ancestor(X, B),    	% X is also B's ancestor and
     A \== B.		% A is not the same as B.
 
-%   There are lots of other different ways of solving this problem.
+is_integer(0).
+is_integer(X) :- is_integer(Y),write(Y), write(X),nl, X is Y+1.
+
+idiv(X,Y,Result) :- is_integer(Result),
+Prod1 is Result*Y,
+Prod2 is (Result+1)*Y,
+Prod1 =< X, Prod2 > X,
+!.
 
 
-%   PROBLEM 4
-%   How can you decide whether two people could possibly marry, given that
-%   only an unrelated male and female are allowed to do this ?
+/*myList(Pred, L) :-
+    myList(Pred, [], L).
+	
+myList(Pred, Accum, L) :-
+   is(Value, eval(Pred)),
+    \+ member(Value, Accum), !,
+    myList(I, [Value|Accum], L). 
+myList(_, L, L).
+%canReadMsg(I, Value)*/
 
-possible_to_marry(A, B):-	% It is possible for A to marry B if
-    male(A),			% A is male and
-    female(B),			% B is female and
-    \+ related(A, B).		% A is not related to B.
+listAll(X,AllMsgs):- 
+	canReadMsg(X,Msg), listAll(X,Msg,AllMsgs).
+	
+listAll(X,Acc,Result) :- 
+	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res, flatten([Acc|Res],Result).
 
-
-%   PROBLEM 5
-%   How can you decide whether two people can marry, given the current
-%   matrimonial ties ?
-
-can_marry(A, B):-		% A can marry B if
-    possible_to_marry(A, B),	% it is possible for A to marry B and
-    \+ matrimonial_tie(A),	% there is no matrimonial tie for A and
-    \+ matrimonial_tie(B).    	% there is no matrimonial tie for B.
-
-matrimonial_tie(X):-	% X is matrimonially tied if
-    married(X, _).	% X is married to somebody.
-
-matrimonial_tie(X):-	% X is matrimonially tied if
-    married(_, X).	% somebody is married to X.
-
-
-%   FOOTNOTE
-%   The symbol \== means "not the same as" (e.g. foo \== baz is true).
-%   The symbol \+ means "not provable" (e.g. \+ false is always true).
-%   The symbol _ represents an "anonymous variable" (i.e. a variable
-%              for which there is no need for a particular name).
-%   Comments are on lines beginning with %
-%            or in sections bounded by /* and */
-
-
+ 
 follows(anne,fred).
 follows(fred,julie).
 follows(fred,susan).
@@ -179,14 +108,14 @@ follows(john,fred).
 follows(julie,fred).
 follows(susan,john).
 follows(susan,julie).
-
+ 
 
 tweeted(anne,[tweet1,tweet5]).
 tweeted(fred,[tweet2, tweet7,tweet8]).
 tweeted(john,[tweet3,tweet4]).
 tweeted(julie,[tweet6]).
 tweeted(susan,[tweet9,tweet10]).
-
+ 
 tweetsOf(X,Y):- tweeted(X,Y).
 
 canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
