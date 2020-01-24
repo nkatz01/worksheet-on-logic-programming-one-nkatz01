@@ -120,6 +120,8 @@ tweeted(susan,[tweet9,tweet10]).
 tweetsOf(X,Y):- tweeted(X,Y).
 
 canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
+
+%accumulates all tweets that can be seen but for one person only
 myList(I, L) :-
     myList(I, [], L).
 	
@@ -129,6 +131,14 @@ myList(I, Accum, L) :-
     myList(I, [Value|Accum], L). 
 myList(I, L, [I,'->'|S]) :- flatten(L,S).
 
+%improvement on canReadMsg but need to be implemented recursively (also still only one person)
+listAll(X,AllMsgs):- 
+	canReadMsg(X,Msg), listAll(X,Msg,AllMsg),flatten(AllMsg,AllMsgs).
+
+	
+listAll(X,Acc,[Acc|Res]) :- 
+	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res.
+	
 mutual(X,Y) :- follows(X,Y), follows(Y,X).
 
 %only partial solution
