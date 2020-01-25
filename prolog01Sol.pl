@@ -136,13 +136,8 @@ mutual(X,Y) :- follows(X,Y), follows(Y,X).
 %only partial solution
 %allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
 
-%d) If everyone resends every message they receive, which messages can Fred see?
+%9 d) 
+ifEveryoneRetweets(X,Results) :- findall(Res, helperRetweets(X,Res),List), flatten(List,Ls), sort(0,@<,Ls,Results). 
+helperRetweets(X,Res) :- retweets(X,[],Res,Accu).%optionally a list of the people-chain can be retreived.
 
-
-retweets(X,T) :- listAllMsgForPerson(X,[_,T]).
-
-canAlsoSee(X,M) :- follows(X,Y),   retweets(Y,M); listAllMsgForPerson(X,[_,M]).
-
-%8
-
-   
+retweets(X,Acc,[M],Accu) :- \+follows(X,_),tweeted(X,M),Accu = [X|Acc];follows(X,Y),\+follows(Y,_),tweeted(Y,M),Accu = [Y|Acc];follows(X,Y),follows(Y,_),member(Y,Acc),tweeted(X,M),Accu = [X|Acc].
