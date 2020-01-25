@@ -74,33 +74,8 @@ related(A, B):-		% A is related to B if
     ancestor(X, B),    	% X is also B's ancestor and
     A \== B.		% A is not the same as B.
 
-is_integer(0).
-is_integer(X) :- is_integer(Y),write(Y), write(X),nl, X is Y+1.
-
-idiv(X,Y,Result) :- is_integer(Result),
-Prod1 is Result*Y,
-Prod2 is (Result+1)*Y,
-Prod1 =< X, Prod2 > X,
-!.
-
-
-/*myList(Pred, L) :-
-    myList(Pred, [], L).
-	
-myList(Pred, Accum, L) :-
-   is(Value, eval(Pred)),
-    \+ member(Value, Accum), !,
-    myList(I, [Value|Accum], L). 
-myList(_, L, L).
-%canReadMsg(I, Value)*/
-
-listAll(X,AllMsgs):- 
-	canReadMsg(X,Msg), listAll(X,Msg,AllMsgs).
-	
-listAll(X,Acc,Result) :- 
-	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res, flatten([Acc|Res],Result).
-
  
+
 follows(anne,fred).
 follows(fred,julie).
 follows(fred,susan).
@@ -108,7 +83,7 @@ follows(john,fred).
 follows(julie,fred).
 follows(susan,john).
 follows(susan,julie).
- 
+
 
 tweeted(anne,[tweet1,tweet5]).
 tweeted(fred,[tweet2, tweet7,tweet8]).
@@ -119,19 +94,37 @@ tweeted(susan,[tweet9,tweet10]).
 tweetsOf(X,Y):- tweeted(X,Y).
 
 canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
+listAllMsgForPerson(X,[X|[AllMsgs]]):-   listAll(X,[],AllMsg),flatten(AllMsg,AllMsgs).
+listAll(X,Acc,Result) :- 
+	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res, listAll(X,[Res|Acc],Result),!.
+listAll(X,Acc,Acc).
 
 mutual(X,Y) :- follows(X,Y), follows(Y,X).
 
 %only partial solution
 allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
 
-retweets(X,M) :- allTheyCanSee(X,Res), member(M,Res).
+/*
+retweets(X,Ppl,[M|T]) :- member(X,Ppl),follows(X,Y), \+member(Y,Ppl), tweeted(X,M); \+follows(X,Y), tweeted(X,M).
+retweets(X,Ppl,[M,N|T]) :-  follows(X,Y),retweets(Y,[X,Y|Ppl],T),tweeted(X,M),tweeted(Y,N);\+tweeted(X,M),tweeted(Y,N);tweeted(X,M),\+tweeted(Y,N).*/
 
-canAlsoSee(X,Res) :- follows(X,Y),   retweets(Y,Res).
+ifEveryoneRetweets(X,Results) :- findall(Res, helperRetweets(X,Res),List), flatten(List,Ls), sort(0,@<,Ls,Results). 
+helperRetweets(X,Res) :- retweets(X,[],Res,Accu).%optionally a list of the people-chain can be retreived.
+
+retweets(X,Acc,[M],Accu) :- \+follows(X,_),tweeted(X,M),Accu = [X|Acc];follows(X,Y),\+follows(Y,_),tweeted(Y,M),Accu = [Y|Acc];follows(X,Y),follows(Y,_),member(Y,Acc),tweeted(X,M),Accu = [X|Acc].
+
+retweets(X,Acc,[M|T],Accu) :-  follows(X,Y), \+member(Y,Acc),retweets(Y,[X|Acc],T,Accu),tweeted(X,M).
+
+%follows(X,Y),follows(Y,_),member(Y,Acc),tweeted(X,M).
+%;follows(X,Y),member(X,Ppl).
+
+%,listAllMsgForPerson(Y,[_,Tw]),\+member(Tw,L)
+%canAlsoSee(X,M) :- follows(X,Y),   retweets(Y,M); listAllMsgForPerson(X,[_,M]).
 
 
-canSee(X,Res) :- follows(X,Y), tweeted(Y,Res), Y\=X.
-canSee(X,Res) :- follows(X,Y), follows(Y,Z), canSee(Z,Res).
+
+%canSee(X,Res) :- follows(X,Y), tweeted(Y,Res), Y\=X.
+%canSee(X,Res) :- follows(X,Y), follows(Y,Z), canSee(Z,Res).
 /*%P is person, T is tweet list instacne, [T] is that put into a list, res is all accum
 outpMsgPerPerson(P,Res) :- msgPerPerson(P, T,[T],Res).
 %,flatten(List,Res).
