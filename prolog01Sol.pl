@@ -122,22 +122,34 @@ tweetsOf(X,Y):- tweeted(X,Y).
 
 %a) Which messages can Fred see (assuming that only direct followers will see a message)?
 
-	%includes cut and base is after recurseive call  
+	
+	%helper function (can also be used on its own but prints out different solutions on request only - though works for any X).
 	canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
 
-	listAllMsgForPerson(X,[X|[AllMsgs]]):- 
-	  listAll(X,[],AllMsg),flatten(AllMsg,AllMsgs).
+	%helper function. 
+	%Given a specified X, you get back X's name together with a 'list' of all tweets (from all solutions combined) they can see. (Note, you cannot ask for multiple solutions with a 'variable' X.)
+	listAllMsgForPerson(X,[X|[AllMsgs]]):- tweeted(X,M), %they can for sure see their own tweets.
+	  listAll(X,[M],AllMsg),flatten(AllMsg,AllMsgs).
+	  
+	%includes cut and base is after recurseive call   
 	listAll(X,Acc,Result) :- 
 	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res, listAll(X,[Res|Acc],Result),!.
 	listAll(X,Acc,Acc).
 	
-mutual(X,Y) :- follows(X,Y), follows(Y,X).
+%b) Find all the persons who are friends, i.e., they follow each other.
+	mutual(X,Y) :- follows(X,Y), follows(Y,X).
 
 %only partial solution
 %allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
 
 %9 d) 
+%find all possible combinations of tweets X may see and return them as a lists with their duplicates removed.
 ifEveryoneRetweets(X,Results) :- findall(Res, helperRetweets(X,Res),List), flatten(List,Ls), sort(Ls,Results). 
 helperRetweets(X,Res) :- retweets(X,[],Res,Accu).%optionally a list of the people-chain can be retreived.
 
+%X, the last person in the chian, Acc to aggregate the people processed so far, then a list of messages, then the results of all people aggregated.
+%covers 3 cases, X follows noone, then take their tweet (and put X into Accu); X follows someone but someone follows noone, then take someone's tweet; X follows someone but someone has already been processed (loop), then take just X's tweet.
 retweets(X,Acc,[M],Accu) :- \+follows(X,_),tweeted(X,M),Accu = [X|Acc];follows(X,Y),\+follows(Y,_),tweeted(Y,M),Accu = [Y|Acc];follows(X,Y),follows(Y,_),member(Y,Acc),tweeted(X,M),Accu = [X|Acc].
+
+%if X follows someone, recourse on someone, provided they're not in the list already and append X to Acc; after returning, take X's tweet and append to list together with the tweet returned from Y.
+retweets(X,Acc,[M|T],Accu) :-  follows(X,Y), \+member(Y,Acc),retweets(Y,[X|Acc],T,Accu),tweeted(X,M).

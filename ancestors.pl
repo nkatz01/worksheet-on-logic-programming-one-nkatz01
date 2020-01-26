@@ -94,37 +94,34 @@ tweeted(susan,[tweet9,tweet10]).
 tweetsOf(X,Y):- tweeted(X,Y).
 
 canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
-listAllMsgForPerson(X,[X|[AllMsgs]]):-   listAll(X,[],AllMsg),flatten(AllMsg,AllMsgs).
-listAll(X,Acc,Result) :- 
+	listAllMsgForPerson(X,[X|[AllMsgs]]):- tweeted(X,M),
+	  listAll(X,[M],AllMsg),flatten(AllMsg,AllMsgs).
+	  
+ 	listAll(X,Acc,Result) :- 
 	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res, listAll(X,[Res|Acc],Result),!.
-listAll(X,Acc,Acc).
+	listAll(X,Acc,Acc).
 
 mutual(X,Y) :- follows(X,Y), follows(Y,X).
 
 %only partial solution
 allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
 
-/*
-retweets(X,Ppl,[M|T]) :- member(X,Ppl),follows(X,Y), \+member(Y,Ppl), tweeted(X,M); \+follows(X,Y), tweeted(X,M).
-retweets(X,Ppl,[M,N|T]) :-  follows(X,Y),retweets(Y,[X,Y|Ppl],T),tweeted(X,M),tweeted(Y,N);\+tweeted(X,M),tweeted(Y,N);tweeted(X,M),\+tweeted(Y,N).*/
 
-ifEveryoneRetweets(X,Results) :- findall(Res, helperRetweets(X,Res),List), flatten(List,Ls), sort(0,@<,Ls,Results). 
+
+ifEveryoneRetweets(X,Results) :- findall(Res, helperRetweets(X,Res),List), flatten(List,Ls), sort(Ls,Results). 
 helperRetweets(X,Res) :- retweets(X,[],Res,Accu).%optionally a list of the people-chain can be retreived.
+
 
 retweets(X,Acc,[M],Accu) :- \+follows(X,_),tweeted(X,M),Accu = [X|Acc];follows(X,Y),\+follows(Y,_),tweeted(Y,M),Accu = [Y|Acc];follows(X,Y),follows(Y,_),member(Y,Acc),tweeted(X,M),Accu = [X|Acc].
 
+
 retweets(X,Acc,[M|T],Accu) :-  follows(X,Y), \+member(Y,Acc),retweets(Y,[X|Acc],T,Accu),tweeted(X,M).
 
-%follows(X,Y),follows(Y,_),member(Y,Acc),tweeted(X,M).
-%;follows(X,Y),member(X,Ppl).
-
-%,listAllMsgForPerson(Y,[_,Tw]),\+member(Tw,L)
-%canAlsoSee(X,M) :- follows(X,Y),   retweets(Y,M); listAllMsgForPerson(X,[_,M]).
 
 
 
-%canSee(X,Res) :- follows(X,Y), tweeted(Y,Res), Y\=X.
-%canSee(X,Res) :- follows(X,Y), follows(Y,Z), canSee(Z,Res).
+
+
 /*%P is person, T is tweet list instacne, [T] is that put into a list, res is all accum
 outpMsgPerPerson(P,Res) :- msgPerPerson(P, T,[T],Res).
 %,flatten(List,Res).
