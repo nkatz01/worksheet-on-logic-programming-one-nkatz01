@@ -139,8 +139,8 @@ tweetsOf(X,Y):- tweeted(X,Y).
 %b) Find all the persons who are friends, i.e., they follow each other.
 	mutual(X,Y) :- follows(X,Y), follows(Y,X).
 
-%only partial solution
-%allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
+%c) 
+listEveryones(Results):- findall(Tweets, listAllMsgForPerson(X,Tweets),Results).
 
 %9 d) 
 %find all possible combinations of tweets X may see and return them as a lists with their duplicates removed.
