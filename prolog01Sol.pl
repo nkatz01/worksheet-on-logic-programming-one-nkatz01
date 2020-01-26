@@ -102,7 +102,7 @@ commonAncestor(X,Y) :- descendent(X,Z), descendent(Y,Z).
 myreverse(L,K) :- reverse(L,Lrev), K = Lrev.
 
 %7,8 & 9
-ffollows(anne,fred).
+follows(anne,fred).
 follows(fred,julie).
 follows(fred,susan).
 follows(john,fred).
@@ -137,7 +137,12 @@ tweetsOf(X,Y):- tweeted(X,Y).
 	listAll(X,Acc,Acc).
 	
 %b) Find all the persons who are friends, i.e., they follow each other.
-	mutual(X,Y) :- follows(X,Y), follows(Y,X).
+	
+	%sorts the resutls so that it cann be asymmetrically identical results can later be romved by setof called in listAllMutuals.
+	mutual(Results) :- follows(X,Y), follows(Y,X),sort([X,Y],Results).
+
+	listAllMutuals(List) :- setof(Pair, mutual(Pair),List).
+
 
 %c) 
 listEveryones(Results):- findall(Tweets, listAllMsgForPerson(X,Tweets),Results).

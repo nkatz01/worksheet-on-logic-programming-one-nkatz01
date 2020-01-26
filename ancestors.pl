@@ -93,7 +93,11 @@ tweeted(susan,[tweet9,tweet10]).
  
 tweetsOf(X,Y):- tweeted(X,Y).
 
+
+
 canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
+	listEveryones(Results):- findall(Tweets, listAllMsgForPerson(X,Tweets),Results).
+	
 	listAllMsgForPerson(X,[X|[AllMsgs]]):- tweeted(X,M),
 	  listAll(X,[M],AllMsg),flatten(AllMsg,AllMsgs).
 	  
@@ -101,10 +105,10 @@ canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
 	canReadMsg(X,Res), \+member(Res,Acc), Acc\=Res, listAll(X,[Res|Acc],Result),!.
 	listAll(X,Acc,Acc).
 
-mutual(X,Y) :- follows(X,Y), follows(Y,X).
+mutual(Results) :- follows(X,Y), follows(Y,X),sort([X,Y],Results).
 
-%only partial solution
-allTheyCanSee(X,Res) :- findall(Y, canReadMsg(X,Y),List), flatten(List,Res).
+listAllMutuals(List) :- setof(Pair, mutual(Pair),List).
+
 
 
 
@@ -117,12 +121,23 @@ retweets(X,Acc,[M],Accu) :- \+follows(X,_),tweeted(X,M),Accu = [X|Acc];follows(X
 
 retweets(X,Acc,[M|T],Accu) :-  follows(X,Y), \+member(Y,Acc),retweets(Y,[X|Acc],T,Accu),tweeted(X,M).
 
+/*add_up_list([],Acc,Results) :- reverse(Acc,Results).
+add_up_list(I,Acc,Results) :- length(I, 1), reverse(Acc,Accu), [Last] = I ,add_up_list([],[Last|Accu],Results).
+add_up_list([H|T],Acc,Results) :- T \= [], Ttl is H+T,  add_up_list(T,[Ttl|T],Results).*/
+
+ 
+add_up_list(L,K):- reverse(L,Ls), add_up_list_h(Ls, Res), reverse(Res,K).  
+
+add_up_list_h([],[]). 
+add_up_list_h([H|T],[Ttl|Newtail]) :-  sum_list(T,Sumrest), Ttl is H+Sumrest, add_up_list_h(T,Newtail).
+ 
+
+/*
+add_up_list_h([H|T],[H]) :- T = []. 
+add_up_list_h([H|T],[Ttl|Newtail]) :-  sum_list(T,Ttl), add_up_list_h(T,Newtail).
 
 
-
-
-
-/*%P is person, T is tweet list instacne, [T] is that put into a list, res is all accum
+%P is person, T is tweet list instacne, [T] is that put into a list, res is all accum
 outpMsgPerPerson(P,Res) :- msgPerPerson(P, T,[T],Res).
 %,flatten(List,Res).
 
