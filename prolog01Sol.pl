@@ -117,7 +117,7 @@ tweeted(john,[tweet3,tweet4]).
 tweeted(julie,[tweet6]).
 tweeted(susan,[tweet9,tweet10]).
 
-tweetsOf(X,Y):- tweeted(X,Y).
+
 
 
 %a) Which messages can Fred see (assuming that only direct followers will see a message)?
@@ -158,3 +158,79 @@ retweets(X,Acc,[M],Accu) :- \+follows(X,_),tweeted(X,M),Accu = [X|Acc];follows(X
 
 %if X follows someone, recourse on someone, provided they're not in the list already and append X to Acc; after returning, take X's tweet and append to list together with the tweet returned from Y.
 retweets(X,Acc,[M|T],Accu) :-  follows(X,Y), \+member(Y,Acc),retweets(Y,[X|Acc],T,Accu),tweeted(X,M).
+
+%10
+add_up_list(L,K):- reverse(L,Ls), add_up_list_h(Ls, Res), reverse(Res,K).  
+
+add_up_list_h([],[]). 
+add_up_list_h([H|T],[Ttl|Newtail]) :-  sum_list(T,Sumrest), Ttl is H+Sumrest, add_up_list_h(T,Newtail).
+
+%11, & 12
+scotish(malcom).
+french(claude).
+walse(owen).
+'northern irland'(sean).
+english(nigel).
+
+cricket(john).
+checs(owen).
+rugby(malcom).
+football(claude).
+football(nigel).
+
+british(john). 
+british(X) :- english(X); 'northern irland'(X); scotish(X); walse(X).
+%alternatively, we can delete one before the previous line and include in the previous line ;X=john	 as an option .
+
+sportsman(X) :- cricket(X); football(X); rugby(X).
+
+%a) 
+	%from the console ->  ?- sportsman(owen). 
+
+
+	allBritishSportsman(Acc):- findall(X,(british(X)),List), britishSportsman([],List,Acc).
+	britishSportsman(Acc,[],Acc).
+	britishSportsman(Acc,[H|T],Res) :- sportsman(H), britishSportsman([H|Acc],T, Res).
+	britishSportsman(Acc,[H|T],Res) :- \+sportsman(H), britishSportsman(Acc,T, Res). 
+
+	%alternatively and more succinct, we can acheive it this way:
+
+	allBritishSportsman(Res):- british(Y), sportsman(Y) ,britishSportsman([Y],Acc, Res),!.
+
+	britishSportsman(Acc,Y, Res) :- british(X), sportsman(X), \+member(X,Acc), britishSportsman([X|Acc], X, Res).
+	britishSportsman(Acc,Y,Acc) :- british(X), sportsman(X), member(X,Acc) .
+
+
+%b) list all nationalities (but English and British are reapeted, hence the alternative solution).
+	/*sitizan(nationality(scotish,malcom)).
+	sitizan(nationality(french,claude)).
+	sitizan(nationality(walse,owen)).
+	sitizan(nationality('northern irland',sean)).
+	sitizan(nationality(english,nigel)).
+	sitizan(nationality(british,john)). 
+	sitizan(nationality(british,X)) :- sitizan(nationality(english,X)); sitizan(nationality('northern irland',X)); sitizan(nationality(scotish,X)); sitizan(nationality(walse,X)).
+	sportsman(X) :- cricket(X); football(X); rugby(X).
+		
+	?- football(X),sitizan(Y), Y = nationality(Z,X). %from the console
+	 
+	allFootballerNation(Res):- football(X),sitizan(Y), Y = nationality(Z,X) ,footballerNation([Z],Acc, Res),!.
+
+	footballerNation(Acc,placeHolder, Res) :- football(X),sitizan(Y), Y = nationality(Z,X) , \+member(Z,Acc), footballerNation([Z|Acc], P, Res).
+	footballerNation(Acc,placeHolder,Acc) :- football(X),sitizan(Y), Y = nationality(Z,X) ,  member(Z,Acc)  .
+	*/
+
+	%(This uses pairs to clear symantic dups (in our case, whoever is British is also English) by also processing name and removing those nationalities where the name is the same.
+	%Must use swish.
+	
+	allFootballerNation(Results):- football(X),sitizan(Y), Y = nationality(Z,X) ,footballerNation([[X-Z]],Acc, Res),flatten(Res,Resu), sort(1, @<, Resu, Results),!.
+
+	footballerNation(Acc,placeHolder, Res) :- football(X),sitizan(Y), Y = nationality(Z,X) , \+member([X-Z],Acc), footballerNation([[X-Z]|Acc], P, Res).
+	footballerNation(Acc,placeHolder,Acc) :- football(X),sitizan(Y), Y = nationality(Z,X) ,  member([X-Z],Acc).
+
+%13
+	merge(L,K,Results) :- append(L,K,Res), sort(Res,Results).
+	
+%14
+	mygcd(A,0,A).
+	mygcd(A,B,Y) :- A > B, Newb is A mod B , mygcd(B,Newb,Y),!.
+	mygcd(A,B,Y) :- Newb is B mod A , mygcd(A,Newb,Y).

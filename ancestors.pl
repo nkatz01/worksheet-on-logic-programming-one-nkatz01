@@ -1,5 +1,5 @@
-
-
+:- use_module(library(assoc)).
+:- use_module(library(pairs)).
 parent(bruce, clarissa).
 parent(fred, greta).
 parent(doris,bobby).
@@ -91,9 +91,6 @@ tweeted(john,[tweet3,tweet4]).
 tweeted(julie,[tweet6]).
 tweeted(susan,[tweet9,tweet10]).
  
-tweetsOf(X,Y):- tweeted(X,Y).
-
-
 
 canReadMsg(X,Y) :- follows(X,Z),tweeted(Z,Y).
 	listEveryones(Results):- findall(Tweets, listAllMsgForPerson(X,Tweets),Results).
@@ -109,9 +106,6 @@ mutual(Results) :- follows(X,Y), follows(Y,X),sort([X,Y],Results).
 
 listAllMutuals(List) :- setof(Pair, mutual(Pair),List).
 
-
-
-
 ifEveryoneRetweets(X,Results) :- findall(Res, helperRetweets(X,Res),List), flatten(List,Ls), sort(Ls,Results). 
 helperRetweets(X,Res) :- retweets(X,[],Res,Accu).%optionally a list of the people-chain can be retreived.
 
@@ -121,39 +115,25 @@ retweets(X,Acc,[M],Accu) :- \+follows(X,_),tweeted(X,M),Accu = [X|Acc];follows(X
 
 retweets(X,Acc,[M|T],Accu) :-  follows(X,Y), \+member(Y,Acc),retweets(Y,[X|Acc],T,Accu),tweeted(X,M).
 
-/*add_up_list([],Acc,Results) :- reverse(Acc,Results).
-add_up_list(I,Acc,Results) :- length(I, 1), reverse(Acc,Accu), [Last] = I ,add_up_list([],[Last|Accu],Results).
-add_up_list([H|T],Acc,Results) :- T \= [], Ttl is H+T,  add_up_list(T,[Ttl|T],Results).*/
 
- 
+
 add_up_list(L,K):- reverse(L,Ls), add_up_list_h(Ls, Res), reverse(Res,K).  
 
 add_up_list_h([],[]). 
 add_up_list_h([H|T],[Ttl|Newtail]) :-  sum_list(T,Sumrest), Ttl is H+Sumrest, add_up_list_h(T,Newtail).
- 
 
+merge(L,K,Results) :- append(L,K,Res), sort(Res,Results).
+
+mygcd(A,0,A).
+mygcd(A,B,Y) :- A > B, Newb is A mod B , mygcd(B,Newb,Y),!.
+mygcd(A,B,Y) :- Newb is B mod A , mygcd(A,Newb,Y).
+
+
+ 
 /*
-add_up_list_h([H|T],[H]) :- T = []. 
-add_up_list_h([H|T],[Ttl|Newtail]) :-  sum_list(T,Ttl), add_up_list_h(T,Newtail).
-
-
-%P is person, T is tweet list instacne, [T] is that put into a list, res is all accum
-outpMsgPerPerson(P,Res) :- msgPerPerson(P, T,[T],Res).
-%,flatten(List,Res).
-
-msgPerPerson(P,T,L,[P|L]).
-msgPerPerson(P,T,L,Res) :- canReadMsg(P,T), not(member(T,L)), msgPerPerson(P,T,[T|L],Res).
- 
-
-
-ask" your knowledge base the following questions (you may want to add rules to the knowledge base to help you answer the questions):
-a) Which messages can Fred see (assuming that only direct followers will see a message)?
-	canReadMsg(fred,Y).
-b) Find all the persons who are friends, i.e., they follow each other.
-	mutual(X,Y).
-c) Output for each person which messages they can see.
-
-d) If everyone resends every message they receive, which messages can Fred see?*/
+ If A≤B, then gcd(A,B) = gcd(A,B−A).
+gcd(A,0) is equal to A.
+*/
 
 
 
