@@ -235,20 +235,26 @@ sportsman(X) :- cricket(X); football(X); rugby(X).
 	mygcd(A,B,Y) :- A > B, Newb is A mod B , mygcd(B,Newb,Y),!.
 	mygcd(A,B,Y) :- Newb is B mod A , mygcd(A,Newb,Y).
 	
-%15
+%15 a)
+node(N,[],[]).
+node(N,L,[]).
+node(N,[],R).
+node(N,L,R).
+
+getValue(T,[V]) :- T = node(V,[],[]).
+getValue(T,[V|NewV]) :- T = node(V,L,[]), getValue(L,NewV).
+getValue(T,Results) :- T = node(V,L,R), R\=[], L\=[], getValue(L,Lval), getValue(R,Rval), Res = [Rval,Lval|V], flatten(Res,Results).
+getValue(T,[V|NewV]) :- T = node(V,[],R), getValue(R,NewV). 
+
+
+/*Additional testing:
+testNode(Tree) :- A = node(3,[],[]), C = node(4,[],[]), B = node(2,A,C),  X = node(6,[],[]) , Z = node(7,[],[]), Y = node(5,X,Z), Tree = node(1,B,Y).
+preOrderTest(List) :- testNode(Tree), getValue(Tree,Ls), reverse(Ls,List).*/
+%Answer:
+
+preOrder(Tree,List) :- getValue(Tree,L),reverse(L,Lst1),  List = Lst1.
+preOrderTest :- A = node(10,[],[]), C = node(8,[],[]), B = node(7,A,C),  X = node(9,[],[]) , Z = node(11,[],[]), Y = node(55,X,Z), Tree = node(0,B,Y), preOrder(Tree ,[0,7,10,8,55,9,11]) .
+
 %b)
 jstReturn(E,E).
 search_tree(L,Tree):- sort(L,Ls), map_list_to_pairs(jstReturn, Ls, Pairlst),list_to_assoc(Pairlst,Tree).
-
-%16
-childless(V,nill, nill).
-rightChild(V,nill, childless).
-rightChild(V,childless, nill).
-bothChildren(V,childless,childless).
-
-myen(V,X) :- X = childless(V,nill,nill).
-myrc(T,V,X):- X = rightChild(V,nill,T).
-mylc(T,V,X):- X = rightChild(V,T, nill).
-mybc(V,LT,RT,X) :- X = bothChildren(V,LT,RT).
-
-testTree(Tree) :- myen(1,A), myen(3,C), mybc(2,A,C,B), myen(5,X), myen(7,Z), mybc(6,X,Z,Y),  mybc(4,B,Y,Tree).
