@@ -133,26 +133,71 @@ mygcd(A,B,Y) :- Newb is B mod A , mygcd(A,Newb,Y).
 jstReturn(E,E).
 search_tree(L,Tree):- sort(L,Ls), map_list_to_pairs(jstReturn, Ls, Pairlst),list_to_assoc(Pairlst,Tree).	
 
-childless(V,nill, nill).
-rightChild(V,nill, childless).
-rightChild(V,childless, nill).
-bothChildren(V,childless,childless).
 
-myen(V,X) :- X = childless(V,nill,nill).
-myrc(T,V,X):- X = rightChild(V,nill,T).
-mylc(T,V,X):- X = rightChild(V,T, nill).
-mybc(V,LT,RT,X) :- X = bothChildren(V,LT,RT).
+node(N,[],[]).
+node(N,L,[]).
+node(N,[],R).
+node(N,L,R).
 
-testTree(Tree) :- myen(1,A), myen(3,C), mybc(2,A,C,B), myen(5,X), myen(7,Z), mybc(6,X,Z,Y),  mybc(4,B,Y,Tree).
 
-getValue(T,V) :- T = bothChildren(_,bothChildren(V,_,_),_).
+getValue(T,[V]) :- T = node(V,[],[]).
+getValue(T,[V|NewV]) :- T = node(V,L,[]), getValue(L,NewV).
+getValue(T,Results) :- T = node(V,L,R), R\=[], L\=[], getValue(L,Lval), getValue(R,Rval), Res = [Rval,Lval|V], flatten(Res,Results).
+getValue(T,[V|NewV]) :- T = node(V,[],R), getValue(R,NewV). 
 
+
+testNode(Tree) :- A = node(3,[],[]), C = node(4,[],[]), B = node(2,A,C),  X = node(6,[],[]) , Z = node(7,[],[]), Y = node(5,X,Z), Tree = node(1,B,Y).
+preOrderTest(List) :- testNode(Tree), getValue(Tree,Ls), reverse(Ls,List).
+
+preOrder(Tree,List) :- getValue(Tree,L),reverse(L,Lst1),  List = Lst1.
+preOrderTest :- A = node(10,[],[]), C = node(8,[],[]), B = node(7,A,C),  X = node(9,[],[]) , Z = node(11,[],[]), Y = node(55,X,Z), Tree = node(0,B,Y), preOrder(Tree ,[0,7,10,8,55,9,11]) .
+
+%getValue(node(2,[],node(1,[],[])),V).
+ %getValue(node(2, node(1,[],[]),[]),V).
+ %getValue(	node(2,node(1,[],[]), node(3,[],[])),V	).
+ %getValue(	node(1,node(1,[],[]), node(1,[],[])),V	).
  /*
-	
+  node(4, node(2, node(1, [], []), node(3, [], [])), node(5, node(6, [], []),[])).
+  
+    node(4, node(2, node(1, [], []), node(3, [], [])), node(5, node(6, [], []), node(7, [], []))).
+
+
+ getValue(T,[V]) :- T = node(V,[],[]).
+getValue(T,[V|NewV]) :- T = node(V,L,[]), getValue(L,NewV).
+
+getValue(T,[V|NewV]) :- T = node(V,L,R), R\=[], getValue(L,NewV). 
+
+getValue(T,[V|NewV]) :- T = node(V,L,R), L\=[], getValue(R,NewV).
+
+getValue(T,[V|NewV]) :- T = node(V,[],R), getValue(R,NewV).  
+ 
+ 
+	 bothChildren(4,
+		bothChildren(2, 												bothChildren(6, 
+			childless(1, nill, nill), 	childless(3, nill, nill)),	 						childless(5, nill, nill), 	childless(7, nill, nill))),
+
 isEmpty(T) :- T = emptybt.
 isLeaf(T) :- 
 addNodeL
 preorder(T,L) :- 
+
+getNode(T,Tr) :-
+getNode(T,Tr) :- X = bothChildren(_,Tr,childless).
+getValue(T,V) :- T = leftChild(V,nill, nill);childless(V,nill, nill);rightChild(V,nill, nill).
+%getValue(T,V) :- T = bothChildren(_,bothChildren(V,_,_),_).
+
+
+childless(V,nill, nill).
+rightChild(V,nill, childless).
+leftChild(V,childless, nill).
+bothChildren(V,childless,childless).
+
+myen(V,X) :- X = childless(V,nill,nill).
+myrc(T,V,X):- X = rightChild(V,nill,T).
+mylc(T,V,X):- X = leftChild(V,T, nill).
+mybc(V,LT,RT,X) :- X = bothChildren(V,LT,RT).
+testTree(Tree) :- myen(1,A), myen(3,C), mybc(2,A,C,B), myen(5,X), myen(7,Z), mybc(6,X,Z,Y),  mybc(4,B,Y,Tree).
+
 
 mkPair([],[]).
 mkPair([T|H],[Res-Res]) :- mkPair(T,Res)
