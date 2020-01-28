@@ -145,6 +145,7 @@ mybc(V,LT,RT,X) :- X = bothChildren(V,LT,RT).
 
 testTree(Tree) :- myen(1,A), myen(3,C), mybc(2,A,C,B), myen(5,X), myen(7,Z), mybc(6,X,Z,Y),  mybc(4,B,Y,Tree).
 
+getValue(T,V) :- T = bothChildren(_,bothChildren(V,_,_),_).
 
  /*
 	
