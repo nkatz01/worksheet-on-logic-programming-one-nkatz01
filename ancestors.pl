@@ -128,11 +128,52 @@ mygcd(A,0,A).
 mygcd(A,B,Y) :- A > B, Newb is A mod B , mygcd(B,Newb,Y),!.
 mygcd(A,B,Y) :- Newb is B mod A , mygcd(A,Newb,Y).
 
+%empty_assoc(Assoc).
 
- 
-/*
- If A≤B, then gcd(A,B) = gcd(A,B−A).
-gcd(A,0) is equal to A.
+jstReturn(E,E).
+search_tree(L,Tree):- sort(L,Ls), map_list_to_pairs(jstReturn, Ls, Pairlst),list_to_assoc(Pairlst,Tree).	
+
+childless(V,nill, nill).
+rightChild(V,nill, childless).
+rightChild(V,childless, nill).
+bothChildren(V,childless,childless).
+
+myen(V,X) :- X = childless(V,nill,nill).
+myrc(T,V,X):- X = rightChild(V,nill,T).
+mylc(T,V,X):- X = rightChild(V,T, nill).
+mybc(V,LT,RT,X) :- X = bothChildren(V,LT,RT).
+
+testTree(Tree) :- myen(1,A), myen(3,C), mybc(2,A,C,B), myen(5,X), myen(7,Z), mybc(6,X,Z,Y),  mybc(4,B,Y,Tree).
+
+
+ /*
+	
+isEmpty(T) :- T = emptybt.
+isLeaf(T) :- 
+addNodeL
+preorder(T,L) :- 
+
+mkPair([],[]).
+mkPair([T|H],[Res-Res]) :- mkPair(T,Res)
+ t(t4, f, <, t
+ (t2, d, <, 											t(t6, g, -, 
+	t(t1, b, <,                                         	t(t5, c, -, t, t), 	t(t7, h, -, t, t))).
+		t(n, a, -, t, t), t), 	t(t3, e, -, t, t)), 		
+	[1,2,3,4,5,6,7]	
+ 	list_to_assoc([n-a, t1-b,t2-d,t3-e,t4-f,t5-c,t6-g,t7-h], Assoc)
+
+emptybt(L,[]).
+consbt(N,T1,T2).
+T1(1,T3,T4).
+T2(2,T5,T6).
+
+Difficult
+Consider a representation of binary trees as terms, as follows:
+
+emptybt is the empty binary tree.
+consbt(N,T1,T2) the binary tree with root N and left and right subtrees, T1 and T2.
+a) Define a predicate preorder(T,L) which holds iff L is the list of nodes produced by the preorder traversal of the binary tree T.
+b) Define a predicate search_tree(L,T) which, given a list of integers L, returns a balanced search-tree T containing the elements of L.
 */
 
 

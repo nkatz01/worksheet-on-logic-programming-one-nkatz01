@@ -234,3 +234,21 @@ sportsman(X) :- cricket(X); football(X); rugby(X).
 	mygcd(A,0,A).
 	mygcd(A,B,Y) :- A > B, Newb is A mod B , mygcd(B,Newb,Y),!.
 	mygcd(A,B,Y) :- Newb is B mod A , mygcd(A,Newb,Y).
+	
+%15
+%b)
+jstReturn(E,E).
+search_tree(L,Tree):- sort(L,Ls), map_list_to_pairs(jstReturn, Ls, Pairlst),list_to_assoc(Pairlst,Tree).
+
+%16
+childless(V,nill, nill).
+rightChild(V,nill, childless).
+rightChild(V,childless, nill).
+bothChildren(V,childless,childless).
+
+myen(V,X) :- X = childless(V,nill,nill).
+myrc(T,V,X):- X = rightChild(V,nill,T).
+mylc(T,V,X):- X = rightChild(V,T, nill).
+mybc(V,LT,RT,X) :- X = bothChildren(V,LT,RT).
+
+testTree(Tree) :- myen(1,A), myen(3,C), mybc(2,A,C,B), myen(5,X), myen(7,Z), mybc(6,X,Z,Y),  mybc(4,B,Y,Tree).
